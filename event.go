@@ -47,20 +47,11 @@ type Event struct {
 // Cancel can be called in before_<EVENT> or leave_<STATE> to cancel the
 // current transition before it happens. It takes an optional error, which will
 // overwrite e.Err if set before.
-func (e *Event) Cancel(err ...error) {
-	e.canceled = true
-	e.cancelFunc()
-
-	if len(err) > 0 {
-		e.Err = err[0]
-	}
-}
+func (e *Event) Cancel(err ...error) { _ = "STUB: not implemented"; return }
 
 // Async can be called in leave_<STATE> to do an asynchronous state transition.
 //
 // The current state transition will be on hold in the old state until a final
 // call to Transition is made. This will complete the transition and possibly
 // call the other callbacks.
-func (e *Event) Async() {
-	e.async = true
-}
+func (e *Event) Async() { _ = "STUB: not implemented"; return }

@@ -25,7 +25,6 @@ package fsm
 
 import (
 	"context"
-	"strings"
 	"sync"
 )
 
@@ -129,154 +128,46 @@ type Callbacks map[string]Callback
 // to the pseudo random nature of Go maps. No checking for multiple keys is
 // currently performed.
 func NewFSM(initial string, events []EventDesc, callbacks map[string]Callback) *FSM {
-	f := &FSM{
-		transitionerObj: &transitionerStruct{},
-		current:         initial,
-		transitions:     make(map[eKey]string),
-		callbacks:       make(map[cKey]Callback),
-		metadata:        make(map[string]interface{}),
-	}
-
-	// Build transition map and store sets of all events and states.
-	allEvents := make(map[string]bool)
-	allStates := make(map[string]bool)
-	for _, e := range events {
-		for _, src := range e.Src {
-			f.transitions[eKey{e.Name, src}] = e.Dst
-			allStates[src] = true
-			allStates[e.Dst] = true
-		}
-		allEvents[e.Name] = true
-	}
-
-	// Map all callbacks to events/states.
-	for name, fn := range callbacks {
-		var target string
-		var callbackType int
-
-		switch {
-		case strings.HasPrefix(name, "before_"):
-			target = strings.TrimPrefix(name, "before_")
-			if target == "event" {
-				target = ""
-				callbackType = callbackBeforeEvent
-			} else if _, ok := allEvents[target]; ok {
-				callbackType = callbackBeforeEvent
-			}
-		case strings.HasPrefix(name, "leave_"):
-			target = strings.TrimPrefix(name, "leave_")
-			if target == "state" {
-				target = ""
-				callbackType = callbackLeaveState
-			} else if _, ok := allStates[target]; ok {
-				callbackType = callbackLeaveState
-			}
-		case strings.HasPrefix(name, "enter_"):
-			target = strings.TrimPrefix(name, "enter_")
-			if target == "state" {
-				target = ""
-				callbackType = callbackEnterState
-			} else if _, ok := allStates[target]; ok {
-				callbackType = callbackEnterState
-			}
-		case strings.HasPrefix(name, "after_"):
-			target = strings.TrimPrefix(name, "after_")
-			if target == "event" {
-				target = ""
-				callbackType = callbackAfterEvent
-			} else if _, ok := allEvents[target]; ok {
-				callbackType = callbackAfterEvent
-			}
-		default:
-			target = name
-			if _, ok := allStates[target]; ok {
-				callbackType = callbackEnterState
-			} else if _, ok := allEvents[target]; ok {
-				callbackType = callbackAfterEvent
-			}
-		}
-
-		if callbackType != callbackNone {
-			f.callbacks[cKey{target, callbackType}] = fn
-		}
-	}
-
-	return f
+	_ = "STUB: not implemented"
+	return nil
 }
+
+// Build transition map and store sets of all events and states.
+
+// Map all callbacks to events/states.
 
 // Current returns the current state of the FSM.
-func (f *FSM) Current() string {
-	f.stateMu.RLock()
-	defer f.stateMu.RUnlock()
-	return f.current
-}
+func (f *FSM) Current() string { _ = "STUB: not implemented"; return "" }
 
 // Is returns true if state is the current state.
-func (f *FSM) Is(state string) bool {
-	f.stateMu.RLock()
-	defer f.stateMu.RUnlock()
-	return state == f.current
-}
+func (f *FSM) Is(state string) bool { _ = "STUB: not implemented"; return false }
 
 // SetState allows the user to move to the given state from current state.
 // The call does not trigger any callbacks, if defined.
-func (f *FSM) SetState(state string) {
-	f.stateMu.Lock()
-	defer f.stateMu.Unlock()
-	f.current = state
-}
+func (f *FSM) SetState(state string) { _ = "STUB: not implemented"; return }
 
 // Can returns true if event can occur in the current state.
-func (f *FSM) Can(event string) bool {
-	f.eventMu.Lock()
-	defer f.eventMu.Unlock()
-	f.stateMu.RLock()
-	defer f.stateMu.RUnlock()
-	_, ok := f.transitions[eKey{event, f.current}]
-	return ok && (f.transition == nil)
-}
+func (f *FSM) Can(event string) bool { _ = "STUB: not implemented"; return false }
 
 // AvailableTransitions returns a list of transitions available in the
 // current state.
-func (f *FSM) AvailableTransitions() []string {
-	f.stateMu.RLock()
-	defer f.stateMu.RUnlock()
-	var transitions []string
-	for key := range f.transitions {
-		if key.src == f.current {
-			transitions = append(transitions, key.event)
-		}
-	}
-	return transitions
-}
+func (f *FSM) AvailableTransitions() []string { _ = "STUB: not implemented"; return nil }
 
 // Cannot returns true if event can not occur in the current state.
 // It is a convenience method to help code read nicely.
-func (f *FSM) Cannot(event string) bool {
-	return !f.Can(event)
-}
+func (f *FSM) Cannot(event string) bool { _ = "STUB: not implemented"; return false }
 
 // Metadata returns the value stored in metadata
 func (f *FSM) Metadata(key string) (interface{}, bool) {
-	f.metadataMu.RLock()
-	defer f.metadataMu.RUnlock()
-	dataElement, ok := f.metadata[key]
-	return dataElement, ok
+	_ = "STUB: not implemented"
+	return nil, false
 }
 
 // SetMetadata stores the dataValue in metadata indexing it with key
-func (f *FSM) SetMetadata(key string, dataValue interface{}) {
-	f.metadataMu.Lock()
-	defer f.metadataMu.Unlock()
-	f.metadata[key] = dataValue
-}
+func (f *FSM) SetMetadata(key string, dataValue interface{}) { _ = "STUB: not implemented"; return }
 
 // DeleteMetadata deletes the dataValue in metadata by key
-func (f *FSM) DeleteMetadata(key string) {
-	f.metadataMu.Lock()
-	delete(f.metadata, key)
-	f.metadataMu.Unlock()
-}
+func (f *FSM) DeleteMetadata(key string) { _ = "STUB: not implemented"; return }
 
 // Event initiates a state transition with the named event.
 //
@@ -296,122 +187,35 @@ func (f *FSM) DeleteMetadata(key string) {
 // The last error should never occur in this situation and is a sign of an
 // internal bug.
 func (f *FSM) Event(ctx context.Context, event string, args ...interface{}) error {
-	f.eventMu.Lock()
+	_ = "STUB: not implemented"
+
 	// in order to always unlock the event mutex, the defer is added
 	// in case the state transition goes through and enter/after callbacks
 	// are called; because these must be able to trigger new state
 	// transitions, it is explicitly unlocked in the code below
-	var unlocked bool
-	defer func() {
-		if !unlocked {
-			f.eventMu.Unlock()
-		}
-	}()
-
-	f.stateMu.RLock()
-	defer f.stateMu.RUnlock()
-
-	if f.transition != nil {
-		return InTransitionError{event}
-	}
-
-	dst, ok := f.transitions[eKey{event, f.current}]
-	if !ok {
-		for ekey := range f.transitions {
-			if ekey.event == event {
-				return InvalidEventError{event, f.current}
-			}
-		}
-		return UnknownEventError{event}
-	}
-
-	ctx, cancel := context.WithCancel(ctx)
-	defer cancel()
-	e := &Event{f, event, f.current, dst, nil, args, false, false, cancel}
-
-	err := f.beforeEventCallbacks(ctx, e)
-	if err != nil {
-		return err
-	}
-
-	if f.current == dst {
-		f.stateMu.RUnlock()
-		defer f.stateMu.RLock()
-		f.eventMu.Unlock()
-		unlocked = true
-		f.afterEventCallbacks(ctx, e)
-		return NoTransitionError{e.Err}
-	}
-
-	// Setup the transition, call it later.
-	transitionFunc := func(ctx context.Context, async bool) func() {
-		return func() {
-			if ctx.Err() != nil {
-				if e.Err == nil {
-					e.Err = ctx.Err()
-				}
-				return
-			}
-
-			f.stateMu.Lock()
-			f.current = dst
-			f.transition = nil // treat the state transition as done
-			f.stateMu.Unlock()
-
-			// at this point, we unlock the event mutex in order to allow
-			// enter state callbacks to trigger another transition
-			// for aynchronous state transitions this doesn't happen because
-			// the event mutex has already been unlocked
-			if !async {
-				f.eventMu.Unlock()
-				unlocked = true
-			}
-			f.enterStateCallbacks(ctx, e)
-			f.afterEventCallbacks(ctx, e)
-		}
-	}
-
-	f.transition = transitionFunc(ctx, false)
-
-	if err = f.leaveStateCallbacks(ctx, e); err != nil {
-		if _, ok := err.(CanceledError); ok {
-			f.transition = nil
-		} else if asyncError, ok := err.(AsyncError); ok {
-			// setup a new context in order for async state transitions to work correctly
-			// this "uncancels" the original context which ignores its cancelation
-			// but keeps the values of the original context available to callers
-			ctx, cancel := uncancelContext(ctx)
-			e.cancelFunc = cancel
-			asyncError.Ctx = ctx
-			asyncError.CancelTransition = cancel
-			f.transition = transitionFunc(ctx, true)
-			return asyncError
-		}
-		return err
-	}
-
-	// Perform the rest of the transition, if not asynchronous.
-	f.stateMu.RUnlock()
-	defer f.stateMu.RLock()
-	err = f.doTransition()
-	if err != nil {
-		return InternalError{}
-	}
-
-	return e.Err
+	return nil
 }
+
+// Setup the transition, call it later.
+
+// treat the state transition as done
+
+// at this point, we unlock the event mutex in order to allow
+// enter state callbacks to trigger another transition
+// for aynchronous state transitions this doesn't happen because
+// the event mutex has already been unlocked
+
+// setup a new context in order for async state transitions to work correctly
+// this "uncancels" the original context which ignores its cancelation
+// but keeps the values of the original context available to callers
+
+// Perform the rest of the transition, if not asynchronous.
 
 // Transition wraps transitioner.transition.
-func (f *FSM) Transition() error {
-	f.eventMu.Lock()
-	defer f.eventMu.Unlock()
-	return f.doTransition()
-}
+func (f *FSM) Transition() error { _ = "STUB: not implemented"; return nil }
 
 // doTransition wraps transitioner.transition.
-func (f *FSM) doTransition() error {
-	return f.transitionerObj.transition(f)
-}
+func (f *FSM) doTransition() error { _ = "STUB: not implemented"; return nil }
 
 // transitionerStruct is the default implementation of the transitioner
 // interface. Other implementations can be swapped in for testing.
@@ -421,75 +225,29 @@ type transitionerStruct struct{}
 //
 // The callback for leave_<STATE> must previously have called Async on its
 // event to have initiated an asynchronous state transition.
-func (t transitionerStruct) transition(f *FSM) error {
-	if f.transition == nil {
-		return NotInTransitionError{}
-	}
-	f.transition()
-	return nil
-}
+func (t transitionerStruct) transition(f *FSM) error { _ = "STUB: not implemented"; return nil }
 
 // beforeEventCallbacks calls the before_ callbacks, first the named then the
 // general version.
 func (f *FSM) beforeEventCallbacks(ctx context.Context, e *Event) error {
-	if fn, ok := f.callbacks[cKey{e.Event, callbackBeforeEvent}]; ok {
-		fn(ctx, e)
-		if e.canceled {
-			return CanceledError{e.Err}
-		}
-	}
-	if fn, ok := f.callbacks[cKey{"", callbackBeforeEvent}]; ok {
-		fn(ctx, e)
-		if e.canceled {
-			return CanceledError{e.Err}
-		}
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
 // leaveStateCallbacks calls the leave_ callbacks, first the named then the
 // general version.
 func (f *FSM) leaveStateCallbacks(ctx context.Context, e *Event) error {
-	if fn, ok := f.callbacks[cKey{f.current, callbackLeaveState}]; ok {
-		fn(ctx, e)
-		if e.canceled {
-			return CanceledError{e.Err}
-		} else if e.async {
-			return AsyncError{Err: e.Err}
-		}
-	}
-	if fn, ok := f.callbacks[cKey{"", callbackLeaveState}]; ok {
-		fn(ctx, e)
-		if e.canceled {
-			return CanceledError{e.Err}
-		} else if e.async {
-			return AsyncError{Err: e.Err}
-		}
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
 // enterStateCallbacks calls the enter_ callbacks, first the named then the
 // general version.
-func (f *FSM) enterStateCallbacks(ctx context.Context, e *Event) {
-	if fn, ok := f.callbacks[cKey{f.current, callbackEnterState}]; ok {
-		fn(ctx, e)
-	}
-	if fn, ok := f.callbacks[cKey{"", callbackEnterState}]; ok {
-		fn(ctx, e)
-	}
-}
+func (f *FSM) enterStateCallbacks(ctx context.Context, e *Event) { _ = "STUB: not implemented"; return }
 
 // afterEventCallbacks calls the after_ callbacks, first the named then the
 // general version.
-func (f *FSM) afterEventCallbacks(ctx context.Context, e *Event) {
-	if fn, ok := f.callbacks[cKey{e.Event, callbackAfterEvent}]; ok {
-		fn(ctx, e)
-	}
-	if fn, ok := f.callbacks[cKey{"", callbackAfterEvent}]; ok {
-		fn(ctx, e)
-	}
-}
+func (f *FSM) afterEventCallbacks(ctx context.Context, e *Event) { _ = "STUB: not implemented"; return }
 
 const (
 	callbackNone int = iota

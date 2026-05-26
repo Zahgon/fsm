@@ -25,18 +25,14 @@ type InvalidEventError struct {
 	State string
 }
 
-func (e InvalidEventError) Error() string {
-	return "event " + e.Event + " inappropriate in current state " + e.State
-}
+func (e InvalidEventError) Error() string { _ = "STUB: not implemented"; return "" }
 
 // UnknownEventError is returned by FSM.Event() when the event is not defined.
 type UnknownEventError struct {
 	Event string
 }
 
-func (e UnknownEventError) Error() string {
-	return "event " + e.Event + " does not exist"
-}
+func (e UnknownEventError) Error() string { _ = "STUB: not implemented"; return "" }
 
 // InTransitionError is returned by FSM.Event() when an asynchronous transition
 // is already in progress.
@@ -44,17 +40,13 @@ type InTransitionError struct {
 	Event string
 }
 
-func (e InTransitionError) Error() string {
-	return "event " + e.Event + " inappropriate because previous transition did not complete"
-}
+func (e InTransitionError) Error() string { _ = "STUB: not implemented"; return "" }
 
 // NotInTransitionError is returned by FSM.Transition() when an asynchronous
 // transition is not in progress.
 type NotInTransitionError struct{}
 
-func (e NotInTransitionError) Error() string {
-	return "transition inappropriate because no state change in progress"
-}
+func (e NotInTransitionError) Error() string { _ = "STUB: not implemented"; return "" }
 
 // NoTransitionError is returned by FSM.Event() when no transition have happened,
 // for example if the source and destination states are the same.
@@ -62,36 +54,30 @@ type NoTransitionError struct {
 	Err error
 }
 
-func (e NoTransitionError) Error() string {
-	if e.Err != nil {
-		return "no transition with error: " + e.Err.Error()
-	}
-	return "no transition"
-}
+func (e NoTransitionError) Error() string { _ = "STUB: not implemented"; return "" }
 
 func (e NoTransitionError) Unwrap() error {
-	return e.Err
+	_ = "STUB: not implemented"
+
+	// CanceledError is returned by FSM.Event() when a callback have canceled a
+	// transition.
+	return nil
 }
 
-// CanceledError is returned by FSM.Event() when a callback have canceled a
-// transition.
 type CanceledError struct {
 	Err error
 }
 
-func (e CanceledError) Error() string {
-	if e.Err != nil {
-		return "transition canceled with error: " + e.Err.Error()
-	}
-	return "transition canceled"
-}
+func (e CanceledError) Error() string { _ = "STUB: not implemented"; return "" }
 
 func (e CanceledError) Unwrap() error {
-	return e.Err
+	_ = "STUB: not implemented"
+
+	// AsyncError is returned by FSM.Event() when a callback have initiated an
+	// asynchronous state transition.
+	return nil
 }
 
-// AsyncError is returned by FSM.Event() when a callback have initiated an
-// asynchronous state transition.
 type AsyncError struct {
 	Err error
 
@@ -99,21 +85,16 @@ type AsyncError struct {
 	CancelTransition func()
 }
 
-func (e AsyncError) Error() string {
-	if e.Err != nil {
-		return "async started with error: " + e.Err.Error()
-	}
-	return "async started"
-}
+func (e AsyncError) Error() string { _ = "STUB: not implemented"; return "" }
 
 func (e AsyncError) Unwrap() error {
-	return e.Err
+	_ = "STUB: not implemented"
+
+	// InternalError is returned by FSM.Event() and should never occur. It is a
+	// probably because of a bug.
+	return nil
 }
 
-// InternalError is returned by FSM.Event() and should never occur. It is a
-// probably because of a bug.
 type InternalError struct{}
 
-func (e InternalError) Error() string {
-	return "internal error on state transition"
-}
+func (e InternalError) Error() string { _ = "STUB: not implemented"; return "" }
